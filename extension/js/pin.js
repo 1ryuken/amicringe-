@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
   const pinDisplay = document.getElementById('pinDisplay');
-  const keypadContainer = document.getElementById('keypadContainer');
+  const keypad = document.getElementById('keypad');
   const clearBtn = document.getElementById('clearBtn');
   const submitBtn = document.getElementById('submitBtn');
   const errorDiv = document.getElementById('error');
@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
   let keypadMapping = {}; // Maps displayed numbers to actual values
   let keyElements = []; // Store references to key elements
   
-  // Generate a random keypad layout with floating keys
+  // Generate a random keypad layout with vibrating keys
   function generateKeypad() {
     // Clear existing keypad
-    keypadContainer.innerHTML = '';
+    keypad.innerHTML = '';
     keyElements = [];
     
     // Create a shuffled array of numbers 0-9
@@ -28,13 +28,6 @@ document.addEventListener('DOMContentLoaded', function() {
       key.className = 'key';
       key.textContent = num;
       
-      // Random initial position within container
-      const left = Math.random() * (keypadContainer.offsetWidth - 60);
-      const top = Math.random() * (keypadContainer.offsetHeight - 60);
-      
-      key.style.left = `${left}px`;
-      key.style.top = `${top}px`;
-      
       // Map the displayed number to its actual value
       keypadMapping[num] = num;
       
@@ -49,68 +42,46 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       });
       
-      keypadContainer.appendChild(key);
+      keypad.appendChild(key);
+      
+      // Store reference for vibration animation
       keyElements.push({
         element: key,
-        // Random velocity for floating effect
-        vx: (Math.random() - 0.5) * 2,
-        vy: (Math.random() - 0.5) * 2,
-        // Random rotation
-        rotation: Math.random() * 360,
-        rotationSpeed: (Math.random() - 0.5) * 4
+        // Random vibration parameters
+        xAmplitude: Math.random() * 5 + 2,
+        yAmplitude: Math.random() * 5 + 2,
+        xFrequency: Math.random() * 0.05 + 0.02,
+        yFrequency: Math.random() * 0.05 + 0.02,
+        xPhase: Math.random() * Math.PI * 2,
+        yPhase: Math.random() * Math.PI * 2
       });
     });
     
-    // Start the animation
+    // Start the vibration animation
     if (!animationRunning) {
       animationRunning = true;
-      animateKeys();
+      animateVibration();
     }
   }
   
   let animationRunning = false;
+  let startTime = Date.now();
   
-  // Animate the keys to float around
-  function animateKeys() {
-    const containerWidth = keypadContainer.offsetWidth;
-    const containerHeight = keypadContainer.offsetHeight;
+  // Animate the keys with vibration effect
+  function animateVibration() {
+    const elapsed = Date.now() - startTime;
     
     keyElements.forEach(item => {
-      // Get current position
-      const rect = item.element.getBoundingClientRect();
-      const containerRect = keypadContainer.getBoundingClientRect();
+      // Calculate vibration offset based on sine waves
+      const xOffset = item.xAmplitude * Math.sin(elapsed * item.xFrequency + item.xPhase);
+      const yOffset = item.yAmplitude * Math.sin(elapsed * item.yFrequency + item.yPhase);
       
-      let left = parseFloat(item.element.style.left) || 0;
-      let top = parseFloat(item.element.style.top) || 0;
-      
-      // Update position based on velocity
-      left += item.vx;
-      top += item.vy;
-      
-      // Bounce off walls
-      if (left <= 0 || left >= containerWidth - rect.width) {
-        item.vx *= -1;
-        // Add some randomness to the bounce
-        item.vx += (Math.random() - 0.5) * 0.5;
-      }
-      
-      if (top <= 0 || top >= containerHeight - rect.height) {
-        item.vy *= -1;
-        // Add some randomness to the bounce
-        item.vy += (Math.random() - 0.5) * 0.5;
-      }
-      
-      // Update rotation
-      item.rotation += item.rotationSpeed;
-      
-      // Apply new position and rotation
-      item.element.style.left = `${left}px`;
-      item.element.style.top = `${top}px`;
-      item.element.style.transform = `rotate(${item.rotation}deg)`;
+      // Apply vibration transform
+      item.element.style.transform = `translate(${xOffset}px, ${yOffset}px)`;
     });
     
     // Continue animation
-    requestAnimationFrame(animateKeys);
+    requestAnimationFrame(animateVibration);
   }
   
   // Update the PIN display with asterisks
@@ -159,4 +130,5 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Initialize
   generateKeypad();
+  startTime = Date.now();
 }); 
