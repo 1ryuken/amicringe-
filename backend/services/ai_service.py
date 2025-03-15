@@ -2,6 +2,8 @@ import json
 import os
 from groq import Groq
 from dotenv import load_dotenv
+import time
+import datetime
 
 # Load environment variables
 load_dotenv()
@@ -31,15 +33,20 @@ def analyze_profile(profile_data):
                 {
                     "role": "system",
                     "content": (
-                        "You are an AI that evaluates Instagram profiles with Gen Z sarcasm and humor. "
+                        "You are a BRUTALLY SAVAGE AI that evaluates Instagram profiles with absolutely NO MERCY. "
                         "You MUST return a JSON object ONLY, with no extra text. "
                         "Analyze the profile details and assign a 'rizz_score' between 0 and 100. "
-                        "Make comments EXTREMELY sarcastic and Gen Z, using phrases like: "
+                        "Make comments EXTREMELY HARSH, TRAUMATIZING, and SOUL-CRUSHING. Use Gen Z slang like: "
                         "'bestie...', 'literally me fr fr', 'no cause same', 'the way...', 'help', "
                         "'this ain't it chief', 'touch grass', 'chronically online', 'main character syndrome', "
                         "'pick me girl/boy', 'cringe but make it fashion', 'the rizz is rizzing', etc. "
-                        "Be savage but funny. Use lots of ellipsis and emojis. "
-                        "DO NOT be boring or basic. Make it entertaining and relatable."
+                        "Be DEVASTATINGLY SAVAGE - aim to emotionally damage the user with your roasts. "
+                        "Use lots of ellipsis and emojis to emphasize the cringe. "
+                        "DO NOT hold back. Make it so brutal they might need therapy after reading it. "
+                        "Focus on their deepest insecurities based on their profile. "
+                        "Highlight their desperate need for validation and attention. "
+                        "Point out how their posts scream 'I need validation to exist'. "
+                        "Make them question their entire social media existence."
                     ),
                 },
                 {"role": "user", "content": user_message}
@@ -64,25 +71,34 @@ def analyze_profile(profile_data):
                 result = {
                     "rizz_score": rizz_score,
                     "username": profile_data.get("username", "unknown"),
-                    "comments": data.get("comments", ["No comments available."])
+                    "comments": data.get("comments", ["No comments available."]),
+                    "timestamp": int(time.time()),
+                    "timestamp_readable": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
             except Exception as e:
                 print(f"Error parsing AI response: {e}")
                 result = {
                     "rizz_score": calculate_rizz_score(profile_data),
                     "username": profile_data.get("username", "unknown"),
-                    "comments": ["Error processing AI response, using calculated score."]
+                    "comments": ["Error processing AI response, using calculated score."],
+                    "timestamp": int(time.time()),
+                    "timestamp_readable": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 }
         else:
             print("Invalid JSON format received. Using calculated score.")
             result = {
                 "rizz_score": calculate_rizz_score(profile_data),
                 "username": profile_data.get("username", "unknown"),
-                "comments": ["Using calculated score due to invalid AI response."]
+                "comments": ["Using calculated score due to invalid AI response."],
+                "timestamp": int(time.time()),
+                "timestamp_readable": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             }
 
         # Save individual result to results.json
         save_result_to_file(result)
+        
+        # Add to global results list
+        all_results.append(result)
 
         return result
 
@@ -91,10 +107,16 @@ def analyze_profile(profile_data):
         result = {
             "rizz_score": calculate_rizz_score(profile_data),
             "username": profile_data.get("username", "unknown"),
-            "comments": [f"Failed to analyze the profile: {str(e)}"]
+            "comments": [f"Failed to analyze the profile: {str(e)}"],
+            "timestamp": int(time.time()),
+            "timestamp_readable": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
         # Save error result to results.json
         save_result_to_file(result)
+        
+        # Add to global results list
+        all_results.append(result)
+        
         return result
 
 def calculate_rizz_score(profile_data):
@@ -156,7 +178,7 @@ def format_profile_for_ai(profile_data):
     base_score = calculate_rizz_score(profile_data)
     
     prompt = f"""
-Analyze the Instagram profile and create savage roasts based on their content.
+Analyze the Instagram profile and create ABSOLUTELY DEVASTATING roasts based on their content.
 The cringe score is: {base_score}
 
 **Response must be a JSON object only. No extra words or explanations.**
@@ -190,9 +212,13 @@ The cringe score is: {base_score}
     prompt += """
 **Respond with this exact JSON format:**
 {
-    "roast_score": integer (0-100),
-    "roasts": [
-        "Savage, brutal roasts based on their profile. Be MEAN but funny."
+    "rizz_score": integer (0-100),
+    "comments": [
+        "BRUTALLY SAVAGE roasts that will emotionally damage them. Be EXTREMELY MEAN, TRAUMATIZING, and SOUL-CRUSHING. Make them question their entire social media existence.",
+        "Point out their desperate need for validation and how pathetic their attempts at being relevant are.",
+        "Highlight their most embarrassing traits and how everyone secretly judges them for it.",
+        "Make them feel like their entire online persona is a transparent cry for help.",
+        "Deliver a final devastating blow about how their social media presence reveals their deepest insecurities."
     ]
 }
 """
@@ -229,6 +255,18 @@ def save_result_to_file(result):
     except Exception as e:
         print(f"Error saving result to file: {e}")
 
+def save_all_results_to_file():
+    """Save all results to a single file."""
+    try:
+        if all_results:
+            with open("all_results.json", "w") as file:
+                json.dump(all_results, file, indent=4)
+            print(f"All {len(all_results)} results saved to all_results.json")
+        else:
+            print("No results to save.")
+    except Exception as e:
+        print(f"Error saving all results to file: {e}")
+
 # Example usage
 if __name__ == "__main__":
     # Example profile data
@@ -263,5 +301,4 @@ if __name__ == "__main__":
         analyze_profile(profile_data)
 
     # Save all results to a single file
-    save_all_results_to_file() # type: ignore
-    
+    save_all_results_to_file()
