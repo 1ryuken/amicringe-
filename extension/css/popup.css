@@ -16,68 +16,123 @@ body {
 .header {
   text-align: center;
   margin-bottom: 20px;
+  background: #2a2a2a;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .header h1 {
   color: #ff6b6b;
   margin: 0;
-  font-size: 24px;
+  font-size: 28px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 h2 {
   color: #ffffff;
-  font-size: 18px;
+  font-size: 20px;
   margin: 0 0 15px 0;
+  text-align: center;
+}
+
+.pin-section, .roast-section, .result-section {
+  background: #2a2a2a;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 input[type="text"],
 input[type="password"] {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 12px;
+  margin-bottom: 15px;
   border: 2px solid #333;
   border-radius: 5px;
-  background: #2a2a2a;
+  background: #1a1a1a;
   color: #ffffff;
   font-size: 14px;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  border-color: #ff6b6b;
+  outline: none;
 }
 
 button {
   background: #ff6b6b;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 12px 20px;
   border-radius: 5px;
   cursor: pointer;
   font-size: 14px;
-  transition: background 0.3s;
+  transition: all 0.3s;
+  width: 100%;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 button:hover {
   background: #ff5252;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
-.score {
-  font-size: 48px;
-  font-weight: bold;
-  color: #ff6b6b;
-  text-align: center;
-  margin: 20px 0;
+button:active {
+  transform: translateY(0);
 }
 
 .comments {
-  background: #2a2a2a;
+  background: #1a1a1a;
   padding: 15px;
   border-radius: 5px;
   margin: 10px 0;
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
 }
 
 .comments p {
-  margin: 5px 0;
-  font-size: 14px;
-  line-height: 1.4;
+  margin: 15px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 10px;
+  background: #333;
+  border-radius: 8px;
+  border-left: 3px solid #ff6b6b;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ff6b6b;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff5252;
+}
+
+/* Add animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.roast-section, .pin-section, .result-section {
+  animation: fadeIn 0.5s ease-out;
 }
 
 .settings-section {
@@ -97,22 +152,4 @@ input[type="checkbox"] {
   width: 18px;
   height: 18px;
   cursor: pointer;
-}
-
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1a1a1a;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #ff6b6b;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #ff5252;
 } 

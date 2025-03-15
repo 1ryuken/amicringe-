@@ -6,7 +6,6 @@ document.addEventListener('DOMContentLoaded', function() {
   const usernameInput = document.getElementById('usernameInput');
   const roastBtn = document.getElementById('roastBtn');
   const resultSection = document.getElementById('resultSection');
-  const rizzScore = document.getElementById('rizzScore');
   const roastComments = document.getElementById('roastComments');
   const closeResult = document.getElementById('closeResult');
 
@@ -59,7 +58,6 @@ document.addEventListener('DOMContentLoaded', function() {
       }
 
       // Display results
-      rizzScore.textContent = `${data.rizz_score}/100`;
       roastComments.innerHTML = data.comments.map(comment => `<p>${comment}</p>`).join('');
       resultSection.style.display = 'block';
       document.getElementById('roastSection').style.display = 'none';
