@@ -26,11 +26,12 @@ function showPinPrompt() {
   // Only show the PIN prompt if it's not already open
   if (!isPinPromptOpen) {
     isPinPromptOpen = true;
+    
+    // Create a full-screen popup instead of a small window
     chrome.windows.create({
       url: 'pin.html',
       type: 'popup',
-      width: 300,
-      height: 400
+      state: 'fullscreen' // Make it fullscreen
     }, (window) => {
       // Store the window ID to track when it's closed
       pinPromptWindowId = window.id;
@@ -52,7 +53,18 @@ function checkPin(enteredPin) {
         });
       });
     } else {
-      // Don't alert here, the pin.js will handle the error display
+      // If PIN is wrong, close the browser
+      chrome.runtime.sendMessage({ type: 'wrongPin' });
+      
+      // Give a brief moment to show the error before closing
+      setTimeout(() => {
+        // Close all windows to exit the browser
+        chrome.windows.getAll({}, function(windows) {
+          windows.forEach(function(window) {
+            chrome.windows.remove(window.id);
+          });
+        });
+      }, 1500);
     }
   });
 }

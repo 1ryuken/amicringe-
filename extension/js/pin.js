@@ -113,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
           errorDiv.style.display = 'block';
           currentPin = '';
           updatePinDisplay();
-          generateKeypad(); // Regenerate keypad on failure
+          // Don't regenerate keypad since we're closing the browser
         }
       });
     } else {
@@ -122,10 +122,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
+  // Listen for wrong PIN message
+  chrome.runtime.onMessage.addListener(function(request) {
+    if (request.type === 'wrongPin') {
+      errorDiv.style.display = 'block';
+    }
+  });
+  
   // Handle window close event
   window.addEventListener('beforeunload', function() {
     // Notify background script that the PIN prompt is closed
     chrome.runtime.sendMessage({ type: 'pinPromptClosed' });
+  });
+  
+  // Prevent the user from closing the PIN window with keyboard shortcuts
+  window.addEventListener('keydown', function(e) {
+    // Prevent Alt+F4, Ctrl+W, etc.
+    if ((e.key === 'F4' && e.altKey) || 
+        (e.key === 'w' && e.ctrlKey) ||
+        (e.key === 'W' && e.ctrlKey)) {
+      e.preventDefault();
+      return false;
+    }
   });
   
   // Initialize
