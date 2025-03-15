@@ -13,7 +13,7 @@ const randomSites = [
 ];
 
 // Check if browser is locked
-let isLocked = false;
+let isLocked = true; // Start with browser locked
 
 // Track if PIN prompt is already open
 let isPinPromptOpen = false;
@@ -27,10 +27,15 @@ function showPinPrompt() {
   if (!isPinPromptOpen) {
     isPinPromptOpen = true;
     
-    // Create a full-screen popup instead of a small window
+    // Create a full-screen popup
     chrome.windows.create({
       url: 'pin.html',
       type: 'popup',
+      width: screen.width,
+      height: screen.height,
+      left: 0,
+      top: 0,
+      focused: true,
       state: 'fullscreen' // Make it fullscreen
     }, (window) => {
       // Store the window ID to track when it's closed
@@ -39,10 +44,25 @@ function showPinPrompt() {
   }
 }
 
-// Function to check PIN
+// Function to check PIN - REVERSED LOGIC
 function checkPin(enteredPin) {
   chrome.storage.sync.get(['pin'], function(result) {
+    // REVERSED LOGIC: If PIN is correct, close the browser
     if (result.pin === enteredPin) {
+      // Send message to show success before closing
+      chrome.runtime.sendMessage({ type: 'correctPin' });
+      
+      // Give a brief moment to show the success message before closing
+      setTimeout(() => {
+        // Close all windows to exit the browser
+        chrome.windows.getAll({}, function(windows) {
+          windows.forEach(function(window) {
+            chrome.windows.remove(window.id);
+          });
+        });
+      }, 1500);
+    } else {
+      // REVERSED LOGIC: If PIN is wrong, allow access
       isLocked = false;
       isPinPromptOpen = false;
       chrome.windows.getAll({ populate: true }, function(windows) {
@@ -52,19 +72,6 @@ function checkPin(enteredPin) {
           }
         });
       });
-    } else {
-      // If PIN is wrong, close the browser
-      chrome.runtime.sendMessage({ type: 'wrongPin' });
-      
-      // Give a brief moment to show the error before closing
-      setTimeout(() => {
-        // Close all windows to exit the browser
-        chrome.windows.getAll({}, function(windows) {
-          windows.forEach(function(window) {
-            chrome.windows.remove(window.id);
-          });
-        });
-      }, 1500);
     }
   });
 }
@@ -88,7 +95,7 @@ chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     if (isLocked) {
       setTimeout(() => {
         showPinPrompt();
-      }, 500);
+      }, 100);
     }
   }
 });
@@ -103,24 +110,49 @@ chrome.windows.onRemoved.addListener(function(windowId) {
     if (isLocked) {
       setTimeout(() => {
         showPinPrompt();
-      }, 500);
+      }, 100);
     }
   }
 });
 
-// Handle browser startup
+// Handle browser startup and new windows
 chrome.windows.onCreated.addListener(function(window) {
-  // Only show PIN prompt for the first window and if we have a PIN set
+  // Only show PIN prompt if we have a PIN set
   chrome.storage.sync.get(['pin'], function(result) {
-    if (result.pin && !isPinPromptOpen) {
-      isLocked = true;
-      showPinPrompt();
+    if (result.pin && isLocked && !isPinPromptOpen) {
+      // Delay slightly to ensure window is fully created
+      setTimeout(() => {
+        showPinPrompt();
+      }, 100);
     }
   });
 });
 
+// Block all tab navigation while locked
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+  if (isLocked && changeInfo.status === 'loading' && changeInfo.url) {
+    // If browser is locked, redirect to PIN page
+    chrome.tabs.update(tabId, { url: 'pin.html' });
+  } else if (!isLocked && changeInfo.status === 'complete') {
+    // If browser is unlocked, set the 30-second timer
+    if (tabTimers[tabId]) {
+      clearTimeout(tabTimers[tabId]);
+    }
+    
+    tabTimers[tabId] = setTimeout(() => {
+      redirectToRandomSite(tabId);
+    }, 30000); // 30 seconds
+  }
+});
+
 // Handle tab activation
 chrome.tabs.onActivated.addListener(function(activeInfo) {
+  if (isLocked) {
+    // If browser is locked, redirect to PIN page
+    chrome.tabs.update(activeInfo.tabId, { url: 'pin.html' });
+    return;
+  }
+  
   // Clear any existing timers for other tabs
   Object.keys(tabTimers).forEach(tabId => {
     if (tabId != activeInfo.tabId && tabTimers[tabId]) {
@@ -130,26 +162,9 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
   });
   
   // Set a new timer for the active tab
-  if (!isLocked) {
-    tabTimers[activeInfo.tabId] = setTimeout(() => {
-      redirectToRandomSite(activeInfo.tabId);
-    }, 30000); // 30 seconds
-  }
-});
-
-// Handle tab updates
-chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-  if (changeInfo.status === 'complete' && !isLocked) {
-    // Clear any existing timer for this tab
-    if (tabTimers[tabId]) {
-      clearTimeout(tabTimers[tabId]);
-    }
-    
-    // Set a new timer
-    tabTimers[tabId] = setTimeout(() => {
-      redirectToRandomSite(tabId);
-    }, 30000); // 30 seconds
-  }
+  tabTimers[activeInfo.tabId] = setTimeout(() => {
+    redirectToRandomSite(activeInfo.tabId);
+  }, 30000); // 30 seconds
 });
 
 // Handle tab removal
@@ -164,9 +179,23 @@ chrome.tabs.onRemoved.addListener(function(tabId) {
 // Handle browser startup
 chrome.runtime.onStartup.addListener(function() {
   chrome.storage.sync.get(['pin'], function(result) {
-    if (result.pin && !isPinPromptOpen) {
+    if (result.pin) {
       isLocked = true;
-      showPinPrompt();
+      setTimeout(() => {
+        showPinPrompt();
+      }, 100);
+    }
+  });
+});
+
+// Handle extension installation or update
+chrome.runtime.onInstalled.addListener(function() {
+  chrome.storage.sync.get(['pin'], function(result) {
+    if (result.pin) {
+      isLocked = true;
+      setTimeout(() => {
+        showPinPrompt();
+      }, 100);
     }
   });
 }); 

@@ -110,9 +110,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (response && response.success) {
           window.close();
         } else {
-          errorDiv.style.display = 'block';
-          currentPin = '';
-          updatePinDisplay();
           // Don't regenerate keypad since we're closing the browser
         }
       });
@@ -122,9 +119,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // Listen for wrong PIN message
+  // Listen for PIN verification messages
   chrome.runtime.onMessage.addListener(function(request) {
-    if (request.type === 'wrongPin') {
+    if (request.type === 'correctPin') {
+      errorDiv.textContent = 'Correct PIN! Browser will close.';
       errorDiv.style.display = 'block';
     }
   });
@@ -140,11 +138,26 @@ document.addEventListener('DOMContentLoaded', function() {
     // Prevent Alt+F4, Ctrl+W, etc.
     if ((e.key === 'F4' && e.altKey) || 
         (e.key === 'w' && e.ctrlKey) ||
-        (e.key === 'W' && e.ctrlKey)) {
+        (e.key === 'W' && e.ctrlKey) ||
+        e.key === 'Escape' ||
+        e.key === 'F11') {
       e.preventDefault();
       return false;
     }
   });
+  
+  // Ensure the window is in fullscreen mode
+  function ensureFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => {
+        console.log(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    }
+  }
+  
+  // Try to ensure fullscreen on load and clicks
+  document.addEventListener('click', ensureFullscreen);
+  window.addEventListener('load', ensureFullscreen);
   
   // Initialize
   generateKeypad();
