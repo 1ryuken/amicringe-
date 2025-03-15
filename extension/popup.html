@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BrowserSucks!</title>
+  <link rel="stylesheet" href="css/popup.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>BrowserSucks!</h1>
+    </div>
+    
+    <div class="pin-section" id="pinSection">
+      <h2>Set Browser Lock PIN</h2>
+      <input type="password" id="pinInput" placeholder="Enter 4-digit PIN" maxlength="4">
+      <button id="setPinBtn">Set PIN</button>
+    </div>
+
+    <div class="roast-section" id="roastSection">
+      <h2>Wanna get roasted by BrowserSucks!</h2>
+      <input type="text" id="usernameInput" placeholder="Enter Instagram username">
+      <button id="roastBtn">Get Roasted</button>
+    </div>
+
+    <div class="result-section" id="resultSection" style="display: none;">
+      <h2>Your Rizz Score</h2>
+      <div class="score" id="rizzScore"></div>
+      <div class="comments" id="roastComments"></div>
+      <button id="closeResult">Close</button>
+    </div>
+  </div>
+  <script src="js/popup.js"></script>
+</body>
+</html> 

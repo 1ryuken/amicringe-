@@ -1,0 +1,32 @@
+{
+  "manifest_version": 3,
+  "name": "BrowserSucks!",
+  "version": "1.0",
+  "description": "Analyze Instagram profiles and get roasted! Plus browser lock and random redirects.",
+  "permissions": [
+    "storage",
+    "tabs",
+    "webNavigation",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "http://localhost:5000/*",
+    "https://*.instagram.com/*"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": "images/icon16.png"
+  },
+  "background": {
+    "service_worker": "js/background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["js/content.js"]
+    }
+  ],
+  "icons": {
+    "128": "images/icon16.png"
+  }
+} 
