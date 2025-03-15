@@ -1,0 +1,11 @@
+# Node.js dependencies
+node_modules/
+
+# Server files (not needed for GitHub Pages)
+server.js
+package.json
+package-lock.json
+
+# Other files
+.DS_Store
+.env 

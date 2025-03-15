@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RoastMe!</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>RoastMe!</h1>
+      <p class="tagline">Get brutally roasted based on your Instagram profile</p>
+    </header>
+
+    <main>
+      <section class="input-section" id="inputSection">
+        <h2>Wanna get roasted?</h2>
+        <div class="input-container">
+          <i class="fab fa-instagram"></i>
+          <input type="text" id="usernameInput" placeholder="Enter your Instagram username">
+        </div>
+        <button id="roastBtn">Get Roasted</button>
+        <div class="loading" id="loadingSpinner">
+          <div class="spinner"></div>
+          <p>Analyzing your profile...</p>
+        </div>
+      </section>
+
+      <section class="result-section" id="resultSection">
+        <h2>Your Roast Results</h2>
+        <div class="comments" id="roastComments"></div>
+        <div class="actions">
+          <button id="copyBtn"><i class="fas fa-copy"></i> Copy Results</button>
+          <button id="newRoastBtn"><i class="fas fa-redo"></i> Roast Someone Else</button>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>Created with 🔥 by RoastMe! | Not affiliated with Instagram</p>
+      <p class="disclaimer">For entertainment purposes only. Don't take it personally!</p>
+    </footer>
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html> 
