@@ -28,7 +28,7 @@ instance/
 .webassets-cache
 
 # React/Node.js
-node_modules/
+/node_modules/
 /frontend/build/
 /frontend/.env
 /frontend/.env.local
@@ -68,3 +68,6 @@ Thumbs.db
 
 .env
 backend/services/roasts.json
+
+# Website node_modules
+/website/node_modules/
